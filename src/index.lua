@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.2
+﻿-- HexFlow Launcher Custom version 2.3
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -11,7 +11,7 @@ local sortTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.2"
+local appversion = "2.3"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -20,10 +20,17 @@ function System.currentDirectory(dir)
     end
 end
 
-Network.init()	 --Retro covers have similar download URL's which are set in function LoadAppTitleTables()
-local onlineCovers = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/"
-local onlineCoversPSP = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSP/"
-local onlineCoversPSX = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PS1/"
+Network.init()
+--@@ HexFlow Custom uses the RetroFlow cover archive found here:
+--@@ https://github.com/jimbob4000/hexflow-covers/
+--@@ Sample:
+--@@ https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/PCSA00029.png
+
+--@@ These local variables are unnecessary in this version and are being removed.
+--@@local onlineCovers = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/"
+--@@local onlineCoversPSP = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSP/"
+--@@local onlineCoversPSX = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PS1/"
+--Retro covers have similar download URL's which are set in the 'DownloadCover' function
 
 -- Speed related settings. System.getCpuSpeed() can be used to check current status.
 System.setBusSpeed(222)
@@ -76,7 +83,7 @@ local toggle2X = nil
 
 local spin_allowance = 0
 local bottomMenu = false
-local utilityMenu = false	 --@@ NEW!
+local utilityMenu = false
 local menuSel = 1
 local render_distance = 8
 local ovrrd_str = ""
@@ -202,8 +209,15 @@ function load_RetroFlow()
 	System.exit()
     end
 
-  --function launch_NooDS(romfile)
-  --end
+--@@function launch_NooDS(romfile)	 --@@ new but unused
+--@@	System.executeUri("psgm:play?titleid=NOODSVITA" .. "&param=" .. romfile)
+--@@	System.exit()
+--@@end
+
+--@@function launch_scummvm(romfile, Working_Launch_ID)	 --@@ new but unused - needs tweaked to capture game ID uncached.
+--@@	System.executeUri("psgm:play?titleid=VSCU00001" .. "&path=" .. romfile .. "&game_id=" .. ??????????????)
+--@@	System.exit()
+--@@end
 
     function xRomDirLookup(rdir)
 	if rdir == 5 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo 64/"
@@ -227,6 +241,7 @@ function load_RetroFlow()
 	elseif rdir == 22 then return	 "ux0:data/RetroFlow/ROMS/Commodore - 64/"
 	elseif rdir == 23 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan Color/"
 	elseif rdir == 24 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan/"
+    --@@elseif rdir ==    then return	 "ux0:/data/RetroFlow/ROMS/ScummVM"	 --@@ new but unused
 	elseif rdir == 25 then return	 "ux0:p8carts/"
 	elseif rdir == 26 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX2/"
 	elseif rdir == 27 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX/"
@@ -268,6 +283,7 @@ function load_RetroFlow()
 	elseif square_type == 22 then	 return "app0:/DATA/icon_c64.png"
 	elseif square_type == 23 then	 return "app0:/DATA/icon_wswan_col.png"
 	elseif square_type == 24 then	 return "app0:/DATA/icon_wswan.png"
+    --@@elseif square_type == 26 then	 return "app0:/DATA/icon_scummvm.png"	 --@@ new but unused
 	elseif square_type == 25 then	 return "app0:/DATA/icon_pico8.png"
 	elseif square_type == 26 then	 return "app0:/DATA/icon_msx2.png"
 	elseif square_type == 27 then	 return "app0:/DATA/icon_msx1.png"
@@ -339,7 +355,7 @@ function load_RetroFlow()
 		end
 		v.app_type = tmpap
 		v.launch_type = tmpap
-		v.icon = imgCoverTmp
+		--@@v.icon = imgCoverTmp					 --@@ Unnecessary
 		custom_path = (v.name:match("(.+)%..+$") or v.name) .. ".png"	 -- take filename and either cut off everything after "." OR if there's no "." use the whole filename. Works for normal roms AND lets pico-8 detect itself as a cover.
 		table.insert(files_table, v)
 		table.insert(tmp_table_out_1, v)
@@ -379,6 +395,7 @@ function load_RetroFlow()
     c64_table =		 Read_Rom_Dir(22)			 -- "ux0:data/RetroFlow/ROMS/Commodore - 64")					 @@ .t64
     wswan_col_table =	 Read_Rom_Dir(23)			 -- "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan Color")			 @@ .ws
     wswan_table =	 Read_Rom_Dir(24)			 -- "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan")				 @@ .ws
+--@@scummvm_table =	 Read_Rom_Dir(  , {"folder"})		 -- "ux0:/data/RetroFlow/ROMS/ScummVM")						 @@ new but unused. only takes whole folders
     pico8_table =	 Read_Rom_Dir(25, {".p8.png"})		 -- "ux0:p8carts")
     msx2_table =	 Read_Rom_Dir(26)			 -- "ux0:data/RetroFlow/ROMS/Microsoft - MSX2")
     msx1_table =	 Read_Rom_Dir(27)			 -- "ux0:data/RetroFlow/ROMS/Microsoft - MSX")
@@ -436,7 +453,7 @@ Font.setPixelSizes(fnt25, 25)
 
 function sanitize(some_data)
     some_data = tostring(some_data)
-    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " ")	 --@@ NEW! Now deletes Windows Notepad return character.
+    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " ")
 end
 
 local menuX = 0
@@ -451,14 +468,14 @@ local app_title = info.title
 local app_short_title = info.short_title
 local app_category = info.category
 local app_titleid = info.titleid
---@@local app_size = 0
-local app_size_text = "0"	 --@@ NEW!
+--local app_size = 0
+local app_size_text = "0"
 local DISC_ID = false		 -- can be a string or a bool false
 
 local master_index = 1
 local p = 1
 local oldpad = 0
-local delayTouch = 8.0
+--@@local delayTouch = 8.0	 --@@ Unnecessary
 local delayButton = 8.0
 local hideBoxes = 0.2
 local tmp_move = 0
@@ -617,7 +634,7 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
 	    if path_game ~= nil then
 		path_game = path_game:gsub("-", "")
 	    end
-	    inp = System.openFile(data, FREAD)		 --@@ NEW! There's probably a better way to do this
+	    inp = System.openFile(data, FREAD)		 -- There's probably a better way to do this
 	 	app_size_text = app_size_text .. " (" .. string.format("%02d", System.sizeFile(inp)/1024/1024) .. "Mb)"
 	    System.closeFile(inp)
 	end
@@ -627,14 +644,13 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
     end
 end
 
--- When swapXO is undefined, check system language. If Japanese, enable swapXO.
-function autoset_XO_swap()
-    swapXO = 0
+function autoset_language()	 --@@ Used to be 'autoset_XO_swap()'
+--@@swapXO = 0			 --@@ Unnecessary
     local getLanguage = System.getLanguage()
 
     if getLanguage == 0 then
 	setLanguage = 9		 -- Japanese
-	swapXO = 1
+--@@	swapXO = 1		 --@@ Unnecessary
   --elseif (getLanguage == 1) or (getLanguage == 18) then	 -- 1=AmericanEnglish, 18=British
   --	setLanguage = 0		 -- American English
     elseif getLanguage == 2 then
@@ -658,12 +674,12 @@ function autoset_XO_swap()
     end	 -- Don't change what language is set if a system language has no co-responding HexFlow Custom language. These languages are as follows:
 	 -- 6=Dutch, 9=Korean, 10=ChineseTrad, 11=ChineseSimple, 12=Finnish, 14=Danish, 15=Norwegian, 19=Turkish
 	 -- Languages with no system language values which are should be imported from RetroFlow: Hungarian, Japanese Ryukyuan.
-    if true==true then
-	return swapXO
-    end
+--@@if true==true then
+--@@	return swapXO		 --@@ Unnecessary
+--@@end
 end
 
-function apply_XO_swap()	 --@@ NEW!
+function apply_XO_swap()
     if Controls.getEnterButton() == SCE_CTRL_CIRCLE then
 	swapXO = 1
 	CTRL_ACCEPT, CTRL_CANCEL = CTRL_CANCEL, CTRL_ACCEPT
@@ -697,16 +713,17 @@ if cur_quick_dir["config.dat"] then
     lockView =		 tonumber(string.sub(str, 15, 15)) or lockView
     showRecentlyPlayed = tonumber(string.sub(str, 16, 16)) or showRecentlyPlayed
     startCategory =	 tonumber(string.sub(str, 17, 18)) or startCategory	 -- Upgraded to double digits
-    setLanguage =	 tonumber(string.sub(str, 19, 20)) or setLanguage	 -- Upgraded to double digits
-    swapXO =		 tonumber(string.sub(str, 21, 21)) or autoset_XO_swap()
+    setLanguage =	 tonumber(string.sub(str, 19, 20)) or autoset_language() -- Upgraded to double digits. @@ NEW! Performs a (slow) auto-detect if necessary.
+--@@swapXO =		 tonumber(string.sub(str, 21, 21)) or autoset_XO_swap()	 --@@ Unnecessary. This is now always scanned instead of cached.
   --smoothScrolling = 	 tonumber(string.sub(str,   ,   )) or smoothScrolling	 -- unused
   --arcadeMerge =	 tonumber(string.sub(str,   ,   )) or arcadeMerge	 -- unused
 else
-    swapXO = autoset_XO_swap()	 --@@ autoset_XO_swap() is very slow; only used when config doesn't exist, or if tonumber(string.sub(str, 21, 21)) == nil
+--@@swapXO = autoset_XO_swap()	 --@@ Unnecessary
+    autoset_language()		 --@@ NEW! Slow. Only done when needed.
     write_config()
 end
 
-apply_XO_swap()	 --@@ NEW!
+apply_XO_swap()
 showCat = startCategory
 
 if showView > 4 then
@@ -970,6 +987,7 @@ end
 
 function WriteRecentlyPlayed(lastPlayedGameID)	 -- Needs cleaned up
     local lastPlayedGameText = ""
+    local recent_duplicate = false		 --@@ NEW!
 
     if lastPlayedGameID == "hotfix_mode" then
 	local lastPlayedGameFile = assert(io.open(cur_dir .. "/lastplayedgame.dat", "r"), "Failed to open lastplayedgame.dat")
@@ -992,8 +1010,14 @@ function WriteRecentlyPlayed(lastPlayedGameID)	 -- Needs cleaned up
     elseif showRecentlyPlayed == 1 then
 	lastPlayedGameText = showCat .. "\n" .. lastPlayedGameID .. "\n"
 	for k, v in ipairs(recently_played_table) do
-	    if k < 12 and v.name ~= lastPlayedGameID then
-		lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"
+	    if k < 12 then	 --@@ and v.name ~= lastPlayedGameID then
+		if v.name ~= lastPlayedGameID then				 --@@ NEW!
+		    lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"
+		else								 --@@ NEW!
+		    recent_duplicate = true					 --@@ NEW!
+		end								 --@@ NEW!
+	    elseif recent_duplicate == true and v.name ~= lastPlayedGameID then	 --@@ NEW!
+		lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"	 --@@ NEW!
 	    end
 	end
     elseif ((setRetroFlow==1 and startCategory==38) or (setRetroFlow~=1 and startCategory==7)) then
@@ -1194,6 +1218,7 @@ function LoadAppTitleTables()
 	    elseif CatNum == 22 then	 return c64_table
 	    elseif CatNum == 23 then	 return wswan_col_table
 	    elseif CatNum == 24 then	 return wswan_table
+	--@@elseif CatNum ==    then	 return scummvm_table	 --@@ new but unused
 	    elseif CatNum == 25 then	 return pico8_table
 	    elseif CatNum == 26 then	 return msx2_table
 	    elseif CatNum == 27 then	 return msx1_table
@@ -1241,6 +1266,7 @@ function LoadAppTitleTables()
 	    elseif CatTextNum == 22 then  return lang_lines[64] --Commodore 64
 	    elseif CatTextNum == 23 then  return lang_lines[86] --WonderSwan Color
 	    elseif CatTextNum == 24 then  return lang_lines[87] --WonderSwan
+	--@@elseif CatTextNum ==    then  return "scummvm_table"	 --@@ new but unused
 	    elseif CatTextNum == 25 then  return lang_lines[88] --PICO-8
 	    elseif CatTextNum == 26 then  return lang_lines[110] --MSX2
 	    elseif CatTextNum == 27 then  return lang_lines[111] --MSX
@@ -1286,6 +1312,7 @@ function LoadAppTitleTables()
 	    elseif getCovers == 22 then	 return "ux0:/data/RetroFlow/COVERS/Commodore - 64/"
 	    elseif getCovers == 23 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan Color/"
 	    elseif getCovers == 24 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan/"
+	--@@elseif getCovers ==    then	 return "ux0:/data/RetroFlow/COVERS/ScummVM/"	 --@@ new but unused
 	    elseif getCovers == 25 then	 return "ux0:/data/RetroFlow/COVERS/Lexaloffle Games - Pico-8/"
 	    elseif getCovers == 26 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX2/"
 	    elseif getCovers == 27 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX/"
@@ -1425,12 +1452,12 @@ function LoadAppTitleTables()
     for i=0, total_apps do
 	k = total_apps - i			 -- reversefor k, v in ipairs(real_app_list) do
 	local v = real_app_list[k]
-	if v					 --@@ I have no idea why it needs this "if v~=nil" (shortened to "if v") but it crashes without it.
+	if v					 -- I have no idea why it needs this "if v~=nil" (shortened to "if v") but it crashes without it.
 	 and (
-	  (v.name==nil)				 --@@ Rolling cache relies on a cool trick of just deleting the name data if an app was successfully loaded from cache.
-	  or (v.directory==false)		 --@@ All real apps are folders.
-	  or (v.name:len()~=9)			 --@@ All real apps are 9 letters long folders.
-	  or (System.doesFileExist(working_dir .. "/" .. v.name .. "/sce_sys/param.sfo")==false) --@@ NEW! Slows loading time but hard-stops anything else that might come through. Example file it's looking for:  "ux0:/app/VITASHELL/sce_sys/param.sfo"
+	  (v.name==nil)				 -- Rolling cache relies on a cool trick of just deleting the name data if an app was successfully loaded from cache.
+	  or (v.directory==false)		 -- All real apps are folders.
+	  or (v.name:len()~=9)			 -- All real apps are 9 letters long folders.
+	  or (System.doesFileExist(working_dir .. "/" .. v.name .. "/sce_sys/param.sfo")==false) -- Slows loading time but hard-stops anything else that might come through. Example file it's looking for:  "ux0:/app/VITASHELL/sce_sys/param.sfo"
 	 ) then
 	    table.remove(real_app_list, k)
 	end
@@ -1609,7 +1636,7 @@ function GetInfoSelected()
     icon_path = "app0:/DATA/noimg.png"
     pic_path = "app0:/DATA/noimg.png"
     apptype = 0
-    app_size_text = "0"			 --@@ Moved here now
+    app_size_text = "0"
     app_titleid = "000000000"
     app_version = "00.00"
     DISC_ID = false
@@ -1618,8 +1645,8 @@ function GetInfoSelected()
 	apptype = xCatLookup(showCat)[p].app_type
         if xCatLookup(showCat)[p].launch_type == 0 then
 	    if System.doesFileExist(working_dir .. "/" .. xCatLookup(showCat)[p].name .. "/sce_sys/param.sfo") then
-		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name			   --example: "ux0:app/SLUS00453"
-		app_size_text = "Size: " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb" --@@ NEW!
+		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name	    --example: "ux0:app/SLUS00453"
+		app_size_text = "Size: " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb"
         	info = System.extractSfo(appdir .. "/sce_sys/param.sfo")
         	icon_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/icon0.png"
         	pic_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/pic0.png"
@@ -1628,21 +1655,21 @@ function GetInfoSelected()
 		app_titleid = tostring(info.titleid)
 		app_version = tostring(info.version)
 		if apptype==2 or apptype==3 then
-		    DISC_ID = readBin(appdir .. "/data/boot.bin", true)	 --@@ app_size_text is now modified in readBin() for PSP/PS1 games.
+		    DISC_ID = readBin(appdir .. "/data/boot.bin", true)		 -- app_size_text is now modified in readBin() for PSP/PS1 games.
 		end
 	    end
 	else
 	    if xCatLookup(showCat)[p].directory then
-		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name			 --example: "ux0:pspemu/PSP/GAME/SLUS00453"
-		app_size = getAppSize(appdir)							 --@@ NEW!
-	    else										 --@@ NEW!
-		app_size = xCatLookup(showCat)[p].size						 --@@ NEW!
+		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name	 --example: "ux0:pspemu/PSP/GAME/SLUS00453"
+		app_size = getAppSize(appdir)
+	    else
+		app_size = xCatLookup(showCat)[p].size
 	    end
-	    if app_size < 900000 and apptype ~= 3 then					 --@@ NEW!
-		app_size_text = "Size: 0Mb, " .. string.format("%02d", app_size/1024) .. "Kb"	 --@@ NEW!
-	    else										 --@@ NEW!
-		app_size_text = "Size: " .. string.format("%02d", app_size/1024/1024) .. "Mb"	 --@@ NEW!
-	    end											 --@@ NEW!
+	    if app_size < 900000 and apptype ~= 3 then
+		app_size_text = "Size: 0Mb, " .. string.format("%02d", app_size/1024) .. "Kb"
+	    else
+		app_size_text = "Size: " .. string.format("%02d", app_size/1024/1024) .. "Mb"
+	    end
 	    icon_path = xSIconLookup(apptype)
 	    if apptype == 2 then
 		pic_path = "ux0:data/RetroFlow/BACKGROUNDS/Sony - PlayStation Portable/"
@@ -1653,7 +1680,7 @@ function GetInfoSelected()
 	    else
 		pic_path = xRomDirLookup(apptype):gsub("/ROMS/", "/BACKGROUNDS/")
 	    end
-	    pic_path = pic_path .. (xCatLookup(showCat)[p].name:match("(.+)%..+$") or xCatLookup(showCat)[p].name) .. ".png"	 --@@ cuts everything after the last "." then add ".png". Example:   "Donkey-Kong.n64" --> "Donkey-Kong"
+	    pic_path = pic_path .. (xCatLookup(showCat)[p].name:match("(.+)%..+$") or xCatLookup(showCat)[p].name) .. ".png"	 -- cuts everything after the last "." then add ".png". Example:   "Donkey-Kong.n64" --> "Donkey-Kong"
 	    app_title = xCatLookup(showCat)[p].apptitle
 	    app_short_title = xCatLookup(showCat)[p].apptitle:gsub(" %(", "("):gsub('%b()', '')	    -- replaces every " (" with "(", then delete the brackets and everything in them.
 	    if app_title:match("%((.+)%)") then		 -- input: "Wario Land (USA) (NTSC).gba" ---> output: "(USA) (NTSC)" @@ input: "Wario Land.gba" ---> output: nothing (FAILS THE "IF" STATEMENT)
@@ -1674,11 +1701,11 @@ function close_triangle_preview()
     end
 end
 
-function close_utility_menu()	 --@@ NEW!
+function close_utility_menu()
     utilityMenu = false
     menuX = 0
     menuY = menuItems
---@@Graphics.freeImage(imgUtilityBorder)
+  --Graphics.freeImage(imgUtilityBorder)
 end
 
 function check_for_out_of_bounds()
@@ -1695,6 +1722,8 @@ function check_for_out_of_bounds()
 	    else
 		master_index = 1
 	    end
+	elseif showView == 6 and curTotal <= 12 then	 --@@ NEW! Less jumpy now.
+	    master_index = 1				 --@@ NEW! Less jumpy now.
         elseif curTotal > 0 then
             master_index = p	 -- 0
         end
@@ -1788,6 +1817,7 @@ function DownloadCover(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/C64/Covers/")		 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN_COL/Covers/")	 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN/Covers/")		 -- WSWAN
+--@@ or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Covers/")	 --@@ new but unused. SCUMMVM
      or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO-8/Covers/")	 -- PICO-8 @@ invalid
      or (apptype==26 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX2/Covers/")		 -- MSX2
      or (apptype==27 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX/Covers/")		 -- MSX1
@@ -1878,6 +1908,7 @@ function DownloadSnap(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Commodore_-_64/df90042ef9823d1b0b9d3ec303051f555dca2246/Named_Snaps/")					 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan_Color/5b57a78fafa4acb8590444c15c116998fcea9dce/Named_Snaps/")			 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan/3913706e173ec5f8c0cdeebd225b16f4dc3dd6c6/Named_Snaps/")				 -- WSWAN
+--@@ or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Named_Snaps/")								 --@@ new but unused. SCUMMVM
      or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO8/Named_Snaps/")								 -- PICO-8 @@ invalid
      or (apptype==26 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX2/12d7e10728cc4c3314b8b14b5a9b1892a886d2ab/Named_Snaps/")				 -- MSX2
      or (apptype==27 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX/ed54675a51597fd5bf66a45318a273f330b7662f/Named_Snaps/")					 -- MSX1
@@ -1956,8 +1987,7 @@ function DownloadCategoryCovers()
 	    System.setMessage("Downloading covers...", true)
 	    System.setMessageProgMsg("Downloading covers...")
 	    for i=1, #xCatLookup(getCovers) do
-	    --@@if string.match(xCatLookup(getCovers)[i].icon_path, "/icon")
-		if string.match(xCatLookup(getCovers)[i].icon_path, "/COVERS/") == nil	 --@@ NEW!
+		if string.match(xCatLookup(getCovers)[i].icon_path, "/COVERS/") == nil
 		and DownloadCover(xCatLookup(getCovers)[i]) then
 		    cvrfound = cvrfound + 1
 		end
@@ -2156,7 +2186,7 @@ local function DrawCover(x, y, text, icon, sel, apptype, reflections)
                 Render.drawModel(modCoverHbrNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
             end
         elseif apptype==5 or apptype==6 then
-	    if inPreview == false	 --@@ NEW! n64_fix. This specific line is a bugfix for "n64 too far to the left in triangle menu"
+	    if inPreview == false	 -- n64_fix
 	    and showView == 1 then	 -- n64_fix
 		x = x - 0.45		 -- n64_fix
 	    end				 -- n64_fix
@@ -2271,7 +2301,6 @@ function DownloadSingleSnap()
 	if not Network.isWifiEnabled() then
 	    System.setMessage("Internet Connection Required", false, BUTTON_OK)
 	elseif not (setBackground > 0.5) then
-	--@@System.setMessage(lang_lines[19] .. ": " .. lang_lines[19] .. "Required", false, BUTTON_OK) --unused. "Custom Background ON Required"
 	    System.setMessage(lang_lines[18] .. ": " .. lang_lines[23], false, BUTTON_OK) --Custom Background OFF
 	elseif DownloadSnap(xCatLookup(showCat)[p]) then
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
@@ -2365,13 +2394,13 @@ end
 local utilityItems = 7
 function execute_switch_bottom_menu()
     if menuSel == 0 then
-	FreeIcons()				    --@@ NEW! 0 Decrypt Icons. Credit to cy33hc for his program "copyicons"
+	FreeIcons()				    --0 Decrypt Icons. Credit to cy33hc for his program "copyicons"
 	FreeMemory()
 	Network.term()
 	System.launchEboot("app0:/copyicons.bin")
     elseif menuSel==1 then
 	System.executeUri("wbapp0:")		    --1 News (Internet Browser)
-    --@@System.executeUri("https://www.google.com") --1 News (Internet Browser:https://www.google.com)
+      --System.executeUri("https://www.google.com") --1 News (Internet Browser:https://www.google.com)
     elseif menuSel == 2 then
 	System.executeUri("psns:")		    --2 Store
     elseif menuSel == 3 then
@@ -2382,7 +2411,7 @@ function execute_switch_bottom_menu()
 	System.executeUri("settings_dlg:")	    --5 System Settings
     elseif menuSel == 6 then
 	if showMenu == 2 then
-	    FreeMemory()			    --@@ NEW! 6 VitaShell (from start menu)
+	    FreeMemory()			    --6 VitaShell (from start menu)
 	    System.launchApp("VITASHELL")
 	    System.exit()
 	else
@@ -2390,7 +2419,7 @@ function execute_switch_bottom_menu()
 	    System.exit()
 	end
     elseif menuSel == 7 then
-	System.executeUri("pstc:")		    --@@ NEW! 7 Trophies
+	System.executeUri("pstc:")		    --7 Trophies
     end
 end
 
@@ -2464,8 +2493,8 @@ while true do
         Render.drawModel(modDefaultBackground, 0, 0, -5, 0, 0, 0)-- Draw Background as model
     end
 
-    --@@ Use this to debug instead of SCE_CTRL_SELECT.
-    --@@ Graphics.debugPrint(10,70, "p:" .. p .. " targetX:" .. targetX .. " curTotal:" .. curTotal, white)
+    -- Use this to debug instead of SCE_CTRL_SELECT.
+    -- Graphics.debugPrint(10,10, " master_index:" .. master_index .. " p:" .. p .. " curTotal:" .. curTotal .. " targetX:" .. targetX .. " targetY:" .. targetY .. " BaseYHotfix:" .. BaseYHotfix, white)
 
     Graphics.fillRect(0, 960, 496, 544, themeCol)-- footer bottom
     if showView == 5 or showView == 6 then
@@ -2530,9 +2559,9 @@ while true do
 		end
 	    end
 	    if skipRow == false and l > p-render_distance and l < p+render_distance+2 then						 --@@ (4/7)
-		--@@if l==p and file.fave_heart == true			 --@@ new but unused
-		--@@    Graphics.drawImage(685, 36, imgFav_small_on)	 --@@ new but unused
-		--@@end							 --@@ new but unused
+		--if l==p and file.fave_heart == true then
+		--    Graphics.drawImage(685, 36, imgFav_small_on)
+		--end
                 if FileLoad[file] == nil then --add a new check here
                     FileLoad[file] = true
                     Threads.addTask(file, {
@@ -2542,8 +2571,6 @@ while true do
                         Index = "ricon"
                     })
                 end
-		-- DrawCover((targetX + l * space) - (#xCatLookup(showCat) * space + space), -0.6, file.name, file.ricon or file.icon, l, file.app_type)--draw visible covers only
-
 		DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.name, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
 
             else
@@ -2703,8 +2730,6 @@ while true do
                 Render.useTexture(modBackground, imgCustomBack)
             end
 
-	    --@@app_size = getAppSize(appdir)/1024/1024	 --@@ Moved to GetInfoSelected()
-
 	    menuY=0
 	    tmpappcat=0
             inPreview = true
@@ -2744,7 +2769,7 @@ while true do
 	DrawCover(prevX, -1.0, file.name, file.ricon or imgCoverTmp, p, file.app_type, 0)
     
         Font.print(fnt22, 50, 190, txtname, white)-- app name
-	if DISC_ID and DISC_ID ~= app_titleid then	 --@@ NEW! Forgot to add "and DISC_ID ~= app_titleid" in the v2.1 release
+	if DISC_ID and DISC_ID ~= app_titleid then
 	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
 	else
 	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
@@ -2769,11 +2794,11 @@ while true do
 	    Font.print(fnt22, 50, 352+40, "Override Category: < " .. tmpcatText .. " >", white)
 	    Font.print(fnt22, 50, 352+80, "Rename", white)
 
-	    --@@if xCatLookup(showCat)[p].fave_heart == true then	 --@@ new but unused
-	    --@@    Graphics.drawImage(420, 50, imgFav_large_on)	 --@@ new but unused
-	    --@@else							 --@@ new but unused
-	    --@@    Graphics.drawImage(420, 50, imgFav_large_off)	 --@@ new but unused
-	    --@@end							 --@@ new but unused
+	    --if xCatLookup(showCat)[p].fave_heart == true then
+	    --    Graphics.drawImage(420, 50, imgFav_large_on)
+	    --else
+	    --    Graphics.drawImage(420, 50, imgFav_large_off)
+	    --end
 
 	    status = System.getMessageState()
 	    if status ~= RUNNING then
@@ -2786,8 +2811,7 @@ while true do
 			end
 		    elseif menuY == 1 then
 			if spin_allowance < 0.1 then
-			    --@@ NEEDS UPDATED BADLY
-			    if showCat == 0 or showCat == 5 or showCat == 6 then
+			    if showCat == 0 or showCat == 5 or showCat == 6 or showCat == 36 or showCat == 37 then	 --@@ Lazy code but works fine for now.
 				spin_allowance = 3
 			    else
 				OverrideCategory()
@@ -2863,11 +2887,11 @@ while true do
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
 	    Font.print(fnt22, 50, 355, "Download Cover", white)
 	    Font.print(fnt22, 50, 355+40, "Download Snap", white)
-	    --@@if xCatLookup(showCat)[p].fave_heart == true then
-	    --@@    Graphics.drawImage(420, 50, imgFav_large_on)
-	    --@@else
-	    --@@    Graphics.drawImage(420, 50, imgFav_large_off)
-	    --@@end
+	    --if xCatLookup(showCat)[p].fave_heart == true then
+	    --    Graphics.drawImage(420, 50, imgFav_large_on)
+	    --else
+	    --    Graphics.drawImage(420, 50, imgFav_large_off)
+	    --end
 
 	    status = System.getMessageState()
 	    if status ~= RUNNING then
@@ -2942,10 +2966,10 @@ while true do
 	elseif menuY == 11 then
 	    Graphics.fillRect(60 + (280 * menuX), 60 + 280 + (280 * menuX), 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
 	elseif menuY > 11 then
-	    --@@ MOVED DOWN
-	elseif menuX == 0 then	 --@@ The ON/OFF settings, left side
+	    --do nothing
+	elseif menuX == 0 then	 -- The ON/OFF settings, left side
 	    Graphics.fillRect(60, 460, 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
-	else			 --@@ The ON/OFF settings, right side
+	else			 -- The ON/OFF settings, right side
 	    Graphics.fillRect(460, 900, 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
 	end
         Graphics.drawLine(60, 900, 70, 70, white)
@@ -3018,7 +3042,7 @@ while true do
 	elseif getBGround == 8 then
 	    BGroundText = lang_lines[71] --Retro
 	elseif getBGround == 9 then
-	    BGroundText = lang_lines[72] --@@ NEW! SwitchView Basic Black
+	    BGroundText = lang_lines[72] --SwitchView Basic Black
 	else
 	    BGroundText = lang_lines[23] --OFF
 	end
@@ -3124,7 +3148,7 @@ while true do
             Font.print(fnt22, 484 + toggle2X + 275, 79 + 272, lang_lines[23], white)--OFF
         end
         
-        Font.print(fnt22, 84, 79 + 306, lang_lines[91] .. ": ", white)--Background #9 & View #5
+        Font.print(fnt22, 84, 79 + 306, lang_lines[91] .. ": ", white)--Allow View #5/#6
 	if setSwitch == 1 then
 	    Font.print(fnt22, 84 + 260 + toggle1X, 79 + 306, lang_lines[22], white)--ON
 	    Font.print(fnt22, 84, 79 + 340, lang_lines[107] .. ": ", white)--Crop 'Vita' in View #5
@@ -3143,23 +3167,23 @@ while true do
 	    end
 	end
 
-	if menuY > 11 then	 --@@ System Apps / System Menu / Utilities
+	if menuY > 11 then	 -- System Apps / System Menu / Utilities
 	    Graphics.fillRect(60, 60 + 280, 77 + (3 * 34), 112 + (10 * 34), darkalpha)-- selection
 	    Graphics.fillRect(60, 60 + 280, 77 + (2 * 34), 112 + (10 * 34), darkalpha)-- selection
 	    Graphics.drawImage(60, 122, imgUtilityBorder)
 	    Graphics.fillRect(60, 60 + 280, 77 + ((menuY - 9) * 34), 112 + ((menuY - 9) * 34), themeCol)-- selection
-	    Font.print(fnt22, 84, 79 + 102, lang_lines[95], white)		 --@@ Decrypt Icons
-	    Font.print(fnt22, 84, 79 + 136, lang_lines[79], white)		 --@@ News
-	    Font.print(fnt22, 84, 79 + 170, lang_lines[80], white)		 --@@ Store
-	    Font.print(fnt22, 84, 79 + 204, lang_lines[81], white)		 --@@ Album
-	    Font.print(fnt22, 84, 79 + 238, lang_lines[82], white)		 --@@ Controls
-	    Font.print(fnt22, 84, 79 + 272, lang_lines[83], white)		 --@@ System Settings
-	    Font.print(fnt22, 84, 79 + 306, "VitaShell", white)			 --@@ VitaShell
-	    Font.print(fnt22, 84, 79 + 340, lang_lines[85], white)		 --@@ Trophies
+	    Font.print(fnt22, 84, 79 + 102, lang_lines[95], white)		 -- Decrypt Icons
+	    Font.print(fnt22, 84, 79 + 136, lang_lines[79], white)		 -- News
+	    Font.print(fnt22, 84, 79 + 170, lang_lines[80], white)		 -- Store
+	    Font.print(fnt22, 84, 79 + 204, lang_lines[81], white)		 -- Album
+	    Font.print(fnt22, 84, 79 + 238, lang_lines[82], white)		 -- Controls
+	    Font.print(fnt22, 84, 79 + 272, lang_lines[83], white)		 -- System Settings
+	    Font.print(fnt22, 84, 79 + 306, "VitaShell", white)			 -- VitaShell
+	    Font.print(fnt22, 84, 79 + 340, lang_lines[85], white)		 -- Trophies
 	end
 
-	--@@ NEW! now sanitized because of the "invalid character spacing glitch"
-	PrintCentered(fnt22, 60+140, 79 + 374, sanitize(lang_lines[101]), white, 22)--@@Utilities @@ Used to be lang_lines[95] Decrypt Icons
+	-- sanitized because of the "invalid character spacing glitch"
+	PrintCentered(fnt22, 60+140, 79 + 374, sanitize(lang_lines[101]), white, 22)--Utilities
         PrintCentered(fnt22, 60+140+280, 79 + 374, sanitize(lang_lines[84]), white, 22)--Exit
 	PrintCentered(fnt22, 60+140+560, 79 + 374, sanitize(lang_lines[13]), white, 22)--More Information (About)
         
@@ -3354,14 +3378,9 @@ while true do
 		    end
                 elseif menuY == 11 then
 		    if menuX == 0 then
-			--@@-- Decrypt Icons
-			--@@FreeIcons()
-			--@@FreeMemory()
-			--@@Network.term()
-			--@@System.launchEboot("app0:/copyicons.bin")
-			utilityMenu = true			 --@@ NEW!
-			menuY = menuItems + 1			 --@@ NEW!
-			imgUtilityBorder = Graphics.loadImage("app0:/DATA/utilityoverlay.png")	 --@@ NEW!
+			utilityMenu = true
+			menuY = menuItems + 1
+			imgUtilityBorder = Graphics.loadImage("app0:/DATA/utilityoverlay.png")
 		    elseif menuX == 1 then
 			-- Exit
 			System.exit()
@@ -3371,16 +3390,16 @@ while true do
 			menuY = 0
 			menuX = 0
 		    end
-                elseif utilityMenu == true then			 --@@ NEW! could also be "(menuY > 11) and (menuY < 21) then"
-		    menuSel = menuY - menuItems - 1		 --@@ NEW! Lazy code, needs improved later maybe
-		    execute_switch_bottom_menu()		 --@@ NEW!
+                elseif utilityMenu == true then			 -- could also be "(menuY > 11) and (menuY < 21) then"
+		    menuSel = menuY - menuItems - 1		 -- Lazy code, needs improved later maybe
+		    execute_switch_bottom_menu()
                 end
                 
                 
 		write_config()	 --Save settings
             elseif (Controls.check(pad, SCE_CTRL_UP)) and not (Controls.check(oldpad, SCE_CTRL_UP)) then
-		if menuY == 12 then				 --@@ NEW!
-		    close_utility_menu()			 --@@ NEW!
+		if menuY == 12 then
+		    close_utility_menu()
 		elseif menuY == 5 or (menuY == 11 and menuX ~= 2) then -- When moving to start menu rows with LESS columns, round "menuX" DOWN.
 		    menuX = 0
                     menuY = menuY - 1
@@ -3391,12 +3410,12 @@ while true do
 		    menuY = menuItems
                 end
             elseif (Controls.check(pad, SCE_CTRL_DOWN)) and not (Controls.check(oldpad, SCE_CTRL_DOWN)) then
-		if utilityMenu == true then			 --@@ NEW!
-		    if menuY < menuItems + utilityItems + 1 then --@@ NEW!
-			menuY = menuY + 1			 --@@ NEW!
-		    else					 --@@ NEW!
-			close_utility_menu()			 --@@ NEW!
-		    end						 --@@ NEW!
+		if utilityMenu == true then
+		    if menuY < menuItems + utilityItems + 1 then
+			menuY = menuY + 1
+		    else
+			close_utility_menu()
+		    end
 		elseif menuY == 10 and menuX == 2 then	 -- When moving to start menu rows with MORE columns, round "menuX" DOWN.
 		    menuY = menuY + 1
 		    menuX = 1
@@ -3407,8 +3426,8 @@ while true do
 		    menuX=0				 -- When going from bottom to top of settings, set menuX to 0.
                 end
             elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
-		if utilityMenu == true then			 --@@ NEW!
-		    close_utility_menu()			 --@@ NEW!
+		if utilityMenu == true then
+		    close_utility_menu()
 		elseif menuY==2 then		 --covers download selection -- [1]=PS VITA, [2]=HOMEBREWS, [3]=PSP, [4]=PSX, [5]=CUSTOM, [default]=ALL
 		    getCovers = Category_Minus(getCovers-1)
 		elseif menuY==3 then		 --Background selection
@@ -3435,8 +3454,8 @@ while true do
 		    end
 		end
             elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
-		if utilityMenu == true then			 --@@ NEW!
-		    close_utility_menu()			 --@@ NEW!
+		if utilityMenu == true then
+		    close_utility_menu()
 		elseif menuY==2 then				 --covers download selection -- [1]=PS VITA, [2]=HOMEBREWS, [3]=PSP, [4]=PSX, [5]=CUSTOM, [default]=ALL
 		    getCovers = Category_Plus(getCovers+1)
 		elseif menuY==3 then				 --Background selection
@@ -3577,7 +3596,7 @@ while true do
 			    launch_retroarch(romfile, "app0:/quicknes_libretro.self")
 		      --elseif launch_mode ==   then	 --@@ NDS
 		      --    launch_NooDS(romfile)
-			elseif launch_mode == 8 then	 --@@ GBA
+			elseif launch_mode == 8 then	 --@@ GBA. @@ launch_NooDS(romfile) can also be used for this.
 			    launch_retroarch(romfile, "app0:/gpsp_libretro.self")
 			elseif launch_mode == 9 then	 --@@ GBC
 			    launch_retroarch(romfile, "app0:/gambatte_libretro.self")
@@ -3611,6 +3630,8 @@ while true do
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
 			elseif launch_mode == 24 then	 --@@ WSWAN
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
+		    --@@elseif launch_mode == 26 then	 --@@ new but unused - needs work. SCUMMVM
+		    --@@    launch_scummvm(romfile, ?????????????????)
 			elseif launch_mode == 25 then	 --@@ PICO8
 			    launch_Fake08(romfile)
 			elseif launch_mode == 26 then	 --@@ MSX2
@@ -3652,8 +3673,8 @@ while true do
             end
         elseif (Controls.check(pad, SCE_CTRL_TRIANGLE) and not Controls.check(oldpad, SCE_CTRL_TRIANGLE)) then
             if showMenu == 0 and app_short_title~="-" then
-		--@@imgFav_large_on = Graphics.loadImage("app0:/DATA/fav-large-on.png")		 --@@ new but unused
-		--@@imgFav_large_off = Graphics.loadImage("app0:/DATA/fav-large-off.png")	 --@@ new but unused
+		--imgFav_large_on = Graphics.loadImage("app0:/DATA/fav-large-on.png")
+		--imgFav_large_off = Graphics.loadImage("app0:/DATA/fav-large-off.png")
 		prvRotY = 0
 		GetInfoSelected()	 -- Full info scan is only here now.
                 showMenu = 1
@@ -3817,14 +3838,14 @@ while true do
 		end
 	    elseif showView == 6 then
 		-- Grid View - pan camera 1/1265 p per pixel moved on Y AXIS with gentle bump back at ends.
-		if (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) > (BaseYHotfix + 0.7)) then	 -- 0.15 above special Y max border (BaseYHotfix + 0.55). Kept in bounds by master_index.
-		    targetY = BaseYHotfix + 0.7
-		elseif (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) < 0.4) then		 -- 0.15 below the special Y minimum border (0.55)
+		if (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) > (BaseYHotfix + 0.7)) and (targetY < BaseYHotfix + 0.7) and not ((curTotal > 18) and (master_index <= 6))then
+		    targetY = BaseYHotfix + 0.7									  -- 0.15 above special Y max border (BaseYHotfix + 0.55). Kept in bounds by master_index. @@ NEW! Less jumpy now.
+		elseif (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) < 0.4) then			  -- 0.15 below the special Y minimum border (0.55)
 		    targetY = 0.4
-		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) < -0.15) then		 -- 0.15 below normal Y minimum border (0)
-		    targetY = -0.15
-		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) > 0.15) then		 -- 0.15 above normal Y max border (0)
-		    targetY = 0.15
+		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) < -0.05) and (targetY > -0.05) then -- 0.05 below normal Y minimum border (0) @@ NEW! Less jumpy now.
+		    targetY = -0.05										  --@@ Used to be -0.15
+		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) > 0.05) then			  -- 0.05 above normal Y max border (0)
+		    targetY = 0.05										  --@@ Used to be 0.15
 		else
 		    targetY = targetY - ((y1 - ystart) / 1265)
 		end
@@ -3912,9 +3933,9 @@ while true do
     elseif showMenu > 0 then
         if (Controls.check(pad, CTRL_CANCEL) and not Controls.check(oldpad, CTRL_CANCEL))	 -- Used to be SCE_CTRL_CIRCLE
 	 and not hasTyped then		 -- Only read controls while not typing.
-	    if utilityMenu == true then	 --@@ NEW!
-		close_utility_menu()	 --@@ NEW!
-	    end				 --@@ NEW!
+	    if utilityMenu == true then
+		close_utility_menu()
+	    end
             status = System.getMessageState()
             if status ~= RUNNING then
 		if spin_allowance > 0 then
@@ -3941,9 +3962,9 @@ while true do
 		    if SwitchviewAssetsAreLoaded == true then
 			SwitchviewAssetsAreLoaded = false
 			Graphics.freeImage(imgCart)
-			--@@Graphics.freeImage(imgAvatar)
-			--@@Graphics.freeImage(imgCont)
-			--@@Graphics.freeImage(img4Square)
+			--Graphics.freeImage(imgAvatar)
+			--Graphics.freeImage(imgCont)
+			--Graphics.freeImage(img4Square)
 			Graphics.freeImage(imgFloor2)
 			Graphics.freeImage(btnMenu1)
 			Graphics.freeImage(btnMenu2)
