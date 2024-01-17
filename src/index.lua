@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.3
+﻿-- HexFlow Launcher Custom version 2.3.1
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -11,7 +11,7 @@ local sortTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.3"
+local appversion = "2.3.1"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -21,16 +21,9 @@ function System.currentDirectory(dir)
 end
 
 Network.init()
---@@ HexFlow Custom uses the RetroFlow cover archive found here:
---@@ https://github.com/jimbob4000/hexflow-covers/
---@@ Sample:
---@@ https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/PCSA00029.png
-
---@@ These local variables are unnecessary in this version and are being removed.
---@@local onlineCovers = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/"
---@@local onlineCoversPSP = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSP/"
---@@local onlineCoversPSX = "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PS1/"
---Retro covers have similar download URL's which are set in the 'DownloadCover' function
+--@@ This app uses the RetroFlow cover archive: https://github.com/jimbob4000/hexflow-covers/
+--@@ Sample: https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/PCSA00029.png
+--@@ For more details, check the 'DownloadCover' function.
 
 -- Speed related settings. System.getCpuSpeed() can be used to check current status.
 System.setBusSpeed(222)
@@ -209,15 +202,15 @@ function load_RetroFlow()
 	System.exit()
     end
 
---@@function launch_NooDS(romfile)	 --@@ new but unused
---@@	System.executeUri("psgm:play?titleid=NOODSVITA" .. "&param=" .. romfile)
---@@	System.exit()
---@@end
+--  function launch_NooDS(romfile)
+--	System.executeUri("psgm:play?titleid=NOODSVITA" .. "&param=" .. romfile)
+--	System.exit()
+--  end
 
---@@function launch_scummvm(romfile, Working_Launch_ID)	 --@@ new but unused - needs tweaked to capture game ID uncached.
---@@	System.executeUri("psgm:play?titleid=VSCU00001" .. "&path=" .. romfile .. "&game_id=" .. ??????????????)
---@@	System.exit()
---@@end
+--  function launch_scummvm(romfile, Working_Launch_ID)	 -- needs work
+--	System.executeUri("psgm:play?titleid=VSCU00001" .. "&path=" .. romfile .. "&game_id=" .. ??????????????)
+--	System.exit()
+--  end
 
     function xRomDirLookup(rdir)
 	if rdir == 5 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo 64/"
@@ -241,7 +234,7 @@ function load_RetroFlow()
 	elseif rdir == 22 then return	 "ux0:data/RetroFlow/ROMS/Commodore - 64/"
 	elseif rdir == 23 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan Color/"
 	elseif rdir == 24 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan/"
-    --@@elseif rdir ==    then return	 "ux0:/data/RetroFlow/ROMS/ScummVM"	 --@@ new but unused
+      --elseif rdir ==    then return	 "ux0:/data/RetroFlow/ROMS/ScummVM"
 	elseif rdir == 25 then return	 "ux0:p8carts/"
 	elseif rdir == 26 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX2/"
 	elseif rdir == 27 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX/"
@@ -283,7 +276,7 @@ function load_RetroFlow()
 	elseif square_type == 22 then	 return "app0:/DATA/icon_c64.png"
 	elseif square_type == 23 then	 return "app0:/DATA/icon_wswan_col.png"
 	elseif square_type == 24 then	 return "app0:/DATA/icon_wswan.png"
-    --@@elseif square_type == 26 then	 return "app0:/DATA/icon_scummvm.png"	 --@@ new but unused
+      --elseif square_type == 26 then	 return "app0:/DATA/icon_scummvm.png"
 	elseif square_type == 25 then	 return "app0:/DATA/icon_pico8.png"
 	elseif square_type == 26 then	 return "app0:/DATA/icon_msx2.png"
 	elseif square_type == 27 then	 return "app0:/DATA/icon_msx1.png"
@@ -355,7 +348,6 @@ function load_RetroFlow()
 		end
 		v.app_type = tmpap
 		v.launch_type = tmpap
-		--@@v.icon = imgCoverTmp					 --@@ Unnecessary
 		custom_path = (v.name:match("(.+)%..+$") or v.name) .. ".png"	 -- take filename and either cut off everything after "." OR if there's no "." use the whole filename. Works for normal roms AND lets pico-8 detect itself as a cover.
 		table.insert(files_table, v)
 		table.insert(tmp_table_out_1, v)
@@ -395,7 +387,7 @@ function load_RetroFlow()
     c64_table =		 Read_Rom_Dir(22)			 -- "ux0:data/RetroFlow/ROMS/Commodore - 64")					 @@ .t64
     wswan_col_table =	 Read_Rom_Dir(23)			 -- "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan Color")			 @@ .ws
     wswan_table =	 Read_Rom_Dir(24)			 -- "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan")				 @@ .ws
---@@scummvm_table =	 Read_Rom_Dir(  , {"folder"})		 -- "ux0:/data/RetroFlow/ROMS/ScummVM")						 @@ new but unused. only takes whole folders
+  --scummvm_table =	 Read_Rom_Dir(  , {"folder"})		 -- "ux0:/data/RetroFlow/ROMS/ScummVM")						 @@ folders
     pico8_table =	 Read_Rom_Dir(25, {".p8.png"})		 -- "ux0:p8carts")
     msx2_table =	 Read_Rom_Dir(26)			 -- "ux0:data/RetroFlow/ROMS/Microsoft - MSX2")
     msx1_table =	 Read_Rom_Dir(27)			 -- "ux0:data/RetroFlow/ROMS/Microsoft - MSX")
@@ -475,7 +467,7 @@ local DISC_ID = false		 -- can be a string or a bool false
 local master_index = 1
 local p = 1
 local oldpad = 0
---@@local delayTouch = 8.0	 --@@ Unnecessary
+--local delayTouch = 8.0	 -- unused
 local delayButton = 8.0
 local hideBoxes = 0.2
 local tmp_move = 0
@@ -495,9 +487,9 @@ local red = Color.new(190, 0, 0)
 local blue = Color.new(2, 72, 158)
 local yellow = Color.new(225, 184, 0)
 local green = Color.new(79, 152, 37)
-local purple = Color.new(151, 0, 185)
 local orange = Color.new(220, 120, 0)
-local darkpurple = Color.new(77, 4, 160)
+local pink = Color.new(170, 68, 101)	 --@@ NEW! Replaces the old 'purple' (151, 0, 185)
+local purple = Color.new(77, 4, 160)	 --@@ Used to be called 'darkpurple'
 local lightblue = Color.new(67,178,255)
 local greyalpha = Color.new(45, 45, 45, 180)
 local bg = Color.new(153, 217, 234)
@@ -594,9 +586,9 @@ function write_config()
 	.. lockView
 	.. showRecentlyPlayed
 	.. string.format("%02d", startCategory)	 -- Upgraded to double digits
-	.. string.format("%02d", setLanguage)	 -- Upgraded to double digits
-	.. 0					 --@@ Used to be swapXO, about to be replaced by a new setting which is 0 default.
-    ), 21)
+--@@	.. string.format("%02d", setLanguage)
+--@@	.. 0
+    ), 18)	 --@@ Used to be 21 before the experimental Error 597 fix.
     System.closeFile(file_config)
 end
 
@@ -644,13 +636,11 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
     end
 end
 
-function autoset_language()	 --@@ Used to be 'autoset_XO_swap()'
---@@swapXO = 0			 --@@ Unnecessary
+--@@function autoset_language()
     local getLanguage = System.getLanguage()
 
     if getLanguage == 0 then
 	setLanguage = 9		 -- Japanese
---@@	swapXO = 1		 --@@ Unnecessary
   --elseif (getLanguage == 1) or (getLanguage == 18) then	 -- 1=AmericanEnglish, 18=British
   --	setLanguage = 0		 -- American English
     elseif getLanguage == 2 then
@@ -674,12 +664,9 @@ function autoset_language()	 --@@ Used to be 'autoset_XO_swap()'
     end	 -- Don't change what language is set if a system language has no co-responding HexFlow Custom language. These languages are as follows:
 	 -- 6=Dutch, 9=Korean, 10=ChineseTrad, 11=ChineseSimple, 12=Finnish, 14=Danish, 15=Norwegian, 19=Turkish
 	 -- Languages with no system language values which are should be imported from RetroFlow: Hungarian, Japanese Ryukyuan.
---@@if true==true then
---@@	return swapXO		 --@@ Unnecessary
 --@@end
-end
 
-function apply_XO_swap()
+--@@function apply_XO_swap()
     if Controls.getEnterButton() == SCE_CTRL_CIRCLE then
 	swapXO = 1
 	CTRL_ACCEPT, CTRL_CANCEL = CTRL_CANCEL, CTRL_ACCEPT
@@ -687,7 +674,7 @@ function apply_XO_swap()
     else
 	swapXO = 0
     end
-end
+--@@end
 
 -- READ SETTINGS
 if cur_quick_dir["config.dat"] then
@@ -713,17 +700,15 @@ if cur_quick_dir["config.dat"] then
     lockView =		 tonumber(string.sub(str, 15, 15)) or lockView
     showRecentlyPlayed = tonumber(string.sub(str, 16, 16)) or showRecentlyPlayed
     startCategory =	 tonumber(string.sub(str, 17, 18)) or startCategory	 -- Upgraded to double digits
-    setLanguage =	 tonumber(string.sub(str, 19, 20)) or autoset_language() -- Upgraded to double digits. @@ NEW! Performs a (slow) auto-detect if necessary.
---@@swapXO =		 tonumber(string.sub(str, 21, 21)) or autoset_XO_swap()	 --@@ Unnecessary. This is now always scanned instead of cached.
+--@@setLanguage =	 tonumber(string.sub(str, 19, 20)) or autoset_language() --@@ Unnecessary. This is now always scanned instead of cached.
   --smoothScrolling = 	 tonumber(string.sub(str,   ,   )) or smoothScrolling	 -- unused
   --arcadeMerge =	 tonumber(string.sub(str,   ,   )) or arcadeMerge	 -- unused
 else
---@@swapXO = autoset_XO_swap()	 --@@ Unnecessary
-    autoset_language()		 --@@ NEW! Slow. Only done when needed.
+--@@autoset_language()
     write_config()
 end
 
-apply_XO_swap()
+--@@apply_XO_swap()
 showCat = startCategory
 
 if showView > 4 then
@@ -786,9 +771,11 @@ function SetThemeColor()
     elseif themeColor == 7 then
         themeCol = orange
     elseif themeColor == 6 then
-        themeCol = purple
+    --@@themeCol = purple
+        themeCol = pink --@@ NEW!
     elseif themeColor == 8 then
-        themeCol = darkpurple
+    --@@themeCol = darkpurple
+        themeCol = purple --@@ NEW!
     else
         themeCol = blue -- default blue
     end
@@ -987,7 +974,7 @@ end
 
 function WriteRecentlyPlayed(lastPlayedGameID)	 -- Needs cleaned up
     local lastPlayedGameText = ""
-    local recent_duplicate = false		 --@@ NEW!
+    local recent_duplicate = false
 
     if lastPlayedGameID == "hotfix_mode" then
 	local lastPlayedGameFile = assert(io.open(cur_dir .. "/lastplayedgame.dat", "r"), "Failed to open lastplayedgame.dat")
@@ -1010,14 +997,14 @@ function WriteRecentlyPlayed(lastPlayedGameID)	 -- Needs cleaned up
     elseif showRecentlyPlayed == 1 then
 	lastPlayedGameText = showCat .. "\n" .. lastPlayedGameID .. "\n"
 	for k, v in ipairs(recently_played_table) do
-	    if k < 12 then	 --@@ and v.name ~= lastPlayedGameID then
-		if v.name ~= lastPlayedGameID then				 --@@ NEW!
+	    if k < 12 then
+		if v.name ~= lastPlayedGameID then
 		    lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"
-		else								 --@@ NEW!
-		    recent_duplicate = true					 --@@ NEW!
-		end								 --@@ NEW!
-	    elseif recent_duplicate == true and v.name ~= lastPlayedGameID then	 --@@ NEW!
-		lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"	 --@@ NEW!
+		else
+		    recent_duplicate = true
+		end
+	    elseif recent_duplicate == true and v.name ~= lastPlayedGameID then
+		lastPlayedGameText = lastPlayedGameText .. v.name .. "\n"
 	    end
 	end
     elseif ((setRetroFlow==1 and startCategory==38) or (setRetroFlow~=1 and startCategory==7)) then
@@ -1218,7 +1205,7 @@ function LoadAppTitleTables()
 	    elseif CatNum == 22 then	 return c64_table
 	    elseif CatNum == 23 then	 return wswan_col_table
 	    elseif CatNum == 24 then	 return wswan_table
-	--@@elseif CatNum ==    then	 return scummvm_table	 --@@ new but unused
+	  --elseif CatNum ==    then	 return scummvm_table
 	    elseif CatNum == 25 then	 return pico8_table
 	    elseif CatNum == 26 then	 return msx2_table
 	    elseif CatNum == 27 then	 return msx1_table
@@ -1266,7 +1253,7 @@ function LoadAppTitleTables()
 	    elseif CatTextNum == 22 then  return lang_lines[64] --Commodore 64
 	    elseif CatTextNum == 23 then  return lang_lines[86] --WonderSwan Color
 	    elseif CatTextNum == 24 then  return lang_lines[87] --WonderSwan
-	--@@elseif CatTextNum ==    then  return "scummvm_table"	 --@@ new but unused
+	  --elseif CatTextNum ==    then  return "scummvm_table"
 	    elseif CatTextNum == 25 then  return lang_lines[88] --PICO-8
 	    elseif CatTextNum == 26 then  return lang_lines[110] --MSX2
 	    elseif CatTextNum == 27 then  return lang_lines[111] --MSX
@@ -1312,7 +1299,7 @@ function LoadAppTitleTables()
 	    elseif getCovers == 22 then	 return "ux0:/data/RetroFlow/COVERS/Commodore - 64/"
 	    elseif getCovers == 23 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan Color/"
 	    elseif getCovers == 24 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan/"
-	--@@elseif getCovers ==    then	 return "ux0:/data/RetroFlow/COVERS/ScummVM/"	 --@@ new but unused
+	  --elseif getCovers ==    then	 return "ux0:/data/RetroFlow/COVERS/ScummVM/"
 	    elseif getCovers == 25 then	 return "ux0:/data/RetroFlow/COVERS/Lexaloffle Games - Pico-8/"
 	    elseif getCovers == 26 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX2/"
 	    elseif getCovers == 27 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX/"
@@ -1367,7 +1354,7 @@ function LoadAppTitleTables()
     local cover_dir_psp = switch_generator(covers_psp)
     local cover_dir_psx = switch_generator(covers_psx)
 
-    if cur_quick_dir["apptitlecache.dat"] then				  -- Faster than System.doesFileExist(...)
+    if cur_quick_dir["apptitlecache.dat"] then			  -- Faster than System.doesFileExist(...)
 	local quick_app_list = {}
 	local cover_path = ""
 	local cover_list = {}
@@ -1908,7 +1895,7 @@ function DownloadSnap(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Commodore_-_64/df90042ef9823d1b0b9d3ec303051f555dca2246/Named_Snaps/")					 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan_Color/5b57a78fafa4acb8590444c15c116998fcea9dce/Named_Snaps/")			 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan/3913706e173ec5f8c0cdeebd225b16f4dc3dd6c6/Named_Snaps/")				 -- WSWAN
---@@ or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Named_Snaps/")								 --@@ new but unused. SCUMMVM
+  -- or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Named_Snaps/")								 -- SCUMMVM @@ unused
      or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO8/Named_Snaps/")								 -- PICO-8 @@ invalid
      or (apptype==26 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX2/12d7e10728cc4c3314b8b14b5a9b1892a886d2ab/Named_Snaps/")				 -- MSX2
      or (apptype==27 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX/ed54675a51597fd5bf66a45318a273f330b7662f/Named_Snaps/")					 -- MSX1
@@ -2811,7 +2798,7 @@ while true do
 			end
 		    elseif menuY == 1 then
 			if spin_allowance < 0.1 then
-			    if showCat == 0 or showCat == 5 or showCat == 6 or showCat == 36 or showCat == 37 then	 --@@ Lazy code but works fine for now.
+			    if showCat == 0 or showCat == 5 or showCat == 6 or showCat == 36 or showCat == 37 then	 -- Lazy code but works fine for now.
 				spin_allowance = 3
 			    else
 				OverrideCategory()
@@ -2985,27 +2972,29 @@ while true do
 	else
 	    Font.print(fnt22, 84 + 260, 79, xTextLookup(startCategory), white)
 	end
-        
-        Font.print(fnt22, 84, 79 + 34,  lang_lines[17] .. ": ", white)--Theme Color
-        if themeColor == 1 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[24], white)--Red
-        elseif themeColor == 2 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[25], white)--Yellow
-        elseif themeColor == 3 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[26], white)--Green
-        elseif themeColor == 4 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[27], white)--Grey
-        elseif themeColor == 5 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[28], white)--Black
-        elseif themeColor == 7 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[30], white)--Orange
-        elseif themeColor == 6 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)--Purple
-        elseif themeColor == 8 then
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--Dark Purple
-        else
-            Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[31], white)--Blue
-        end
+
+	Font.print(fnt22, 84, 79 + 34,  lang_lines[17] .. ": ", white)--Theme Color
+	if themeColor == 1 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[24], white)--Red
+	elseif themeColor == 2 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[25], white)--Yellow
+	elseif themeColor == 3 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[26], white)--Green
+	elseif themeColor == 4 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[27], white)--Grey
+	elseif themeColor == 5 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[28], white)--Black
+	elseif themeColor == 7 then
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[30], white)--Orange
+	elseif themeColor == 6 then
+	--@@Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--@@ NEW! Pink
+	elseif themeColor == 8 then
+	--@@Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--Dark Purple
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)--@@ NEW! Purple @@ used to be called Dark Purple
+	else
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[31], white)--Blue
+	end
 
 	if scanComplete == false then
 	    Font.print(fnt22, 84, 79 + 68, lang_lines[19] .. ":", white)--Download Covers
@@ -3054,7 +3043,8 @@ while true do
 	end
         Font.print(fnt22, 84 + 260, 79 + 102, BGroundText, white)
 
-        Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
+--@@	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
+	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", lightgrey)--Language
         if setLanguage == 1 then
             Font.print(fnt22, 84 + 260, 79 + 136, "German", white)
         elseif setLanguage == 2 then
@@ -3231,13 +3221,12 @@ while true do
 		    end
 		    ApplyBackground(setBackground)
                 elseif menuY == 4 then
-		    if setLanguage < 9 then
-                        setLanguage = setLanguage + 1
-                    else
-                        setLanguage = 0
-                    end
-		    ChangeLanguage()
-
+--@@		    if setLanguage < 9 then
+--@@                        setLanguage = setLanguage + 1
+--@@                    else
+--@@                        setLanguage = 0
+--@@                    end
+--@@		    ChangeLanguage()
                 elseif menuY == 5 then
 		    if menuX == 0 then
 			if Sound.isPlaying(sndMusic) then
@@ -3630,8 +3619,8 @@ while true do
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
 			elseif launch_mode == 24 then	 --@@ WSWAN
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
-		    --@@elseif launch_mode == 26 then	 --@@ new but unused - needs work. SCUMMVM
-		    --@@    launch_scummvm(romfile, ?????????????????)
+		      --elseif launch_mode == 26 then	 --@@ SCUMMVM @@ needs work
+		      --    launch_scummvm(romfile, ?????????????????)
 			elseif launch_mode == 25 then	 --@@ PICO8
 			    launch_Fake08(romfile)
 			elseif launch_mode == 26 then	 --@@ MSX2
@@ -3828,24 +3817,24 @@ while true do
 	    elseif showView == 5 then
 		-- SwitchView - pan camera 1/1840 p per pixel moved with gentle bump back at ends.
 		if targetX + ((x1 - (xstart)) / 1840) > curTotal + 0.2 then
-		    targetX = curTotal + 0.2								 -- 0.2 above max border. Kept in bounds by master_index.
+		    targetX = curTotal + 0.2			 -- 0.2 above max border. Kept in bounds by master_index.
 		elseif curTotal <= 3 and targetX + ((x1 - xstart) / 1840) < curTotal - 0.2 then
-		    targetX = curTotal - 0.2								 -- 0.2 below minimum border.
+		    targetX = curTotal - 0.2			 -- 0.2 below minimum border.
 		elseif curTotal > 3 and targetX + ((x1 - xstart) / 1840) < 3.8 then
-		    targetX = 3.8									 -- 0.2 below special fixed minimum border. Unlike Grid View, SwitchView's special border is calculated here since it's a simple calculation. (Grid View's calculation being: BaseYHotfix)
+		    targetX = 3.8				 -- 0.2 below special fixed minimum border.
 		else
 		    targetX = targetX + ((x1 - xstart) / 1840)
 		end
 	    elseif showView == 6 then
 		-- Grid View - pan camera 1/1265 p per pixel moved on Y AXIS with gentle bump back at ends.
 		if (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) > (BaseYHotfix + 0.7)) and (targetY < BaseYHotfix + 0.7) and not ((curTotal > 18) and (master_index <= 6))then
-		    targetY = BaseYHotfix + 0.7									  -- 0.15 above special Y max border (BaseYHotfix + 0.55). Kept in bounds by master_index. @@ NEW! Less jumpy now.
-		elseif (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) < 0.4) then			  -- 0.15 below the special Y minimum border (0.55)
-		    targetY = 0.4
-		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) < -0.05) and (targetY > -0.05) then -- 0.05 below normal Y minimum border (0) @@ NEW! Less jumpy now.
-		    targetY = -0.05										  --@@ Used to be -0.15
-		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) > 0.05) then			  -- 0.05 above normal Y max border (0)
-		    targetY = 0.05										  --@@ Used to be 0.15
+		    targetY = BaseYHotfix + 0.7			 -- 0.15 above the special Y-axis max border (BaseYHotfix + 0.55). Kept in bounds by master_index.
+		elseif (curTotal > 12) and (targetY - ((y1 - ystart) / 1265) < 0.4) then
+		    targetY = 0.4				 -- 0.15 below the special Y-axis minimum border (0.55)
+		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) < -0.05) and (targetY > -0.05) then
+		    targetY = -0.05				 -- 0.05 below normal Y minimum border (0)
+		elseif (curTotal <= 12) and (targetY - ((y1 - ystart) / 1265) > 0.05) then
+		    targetY = 0.05				 -- 0.05 above normal Y max border (0)
 		else
 		    targetY = targetY - ((y1 - ystart) / 1265)
 		end
@@ -3857,7 +3846,7 @@ while true do
 		if master_index > 1 then
 		    master_index = master_index - 1
 		end
-                xstart = x1				 --refresh tracking start point
+                xstart = x1					 --refresh tracking start point
                 p = p - 1
                 if p > 0 then
                     GetNameSelected()
@@ -3865,7 +3854,7 @@ while true do
 		bottomMenu = false
 		touchdown = 0
 	    elseif x1 < xstart - 60 then
-                xstart = x1				 --refresh tracking start point
+                xstart = x1					 --refresh tracking start point
                 p = p + 1
 		if showView ~= 5 or master_index < curTotal - 3 then
 		    master_index = master_index + 1
